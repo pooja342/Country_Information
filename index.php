@@ -11,6 +11,7 @@
 <body>
    <script>
        $(document).ready(function(){
+          var data = [];
             $("#country").click(function(){
                 var countryid =  $(this).val();
                 $.ajax({
@@ -44,10 +45,19 @@
                 });
             });
             $('button').bind('click', function (event) { 
-            event.preventDefault();
-            var countryid =  $("#country").val();
-            var stateid =  $("#state").val();
-            var cityid =  $("#city").val();
+                event.preventDefault();
+                const itemSet = (localStorage.getItem('names') !== null);
+                 if( itemSet)
+                 {
+                    localStorage.removeItem("lastname");
+                    localStorage.clear();
+                 }
+
+                data.push($("#country :selected").text(),$("#state :selected").text(),$("#city :selected").text());
+                localStorage.setItem('names', JSON.stringify(data));
+                var countryid =  $("#country").val();
+                var stateid =  $("#state").val();
+                var cityid =  $("#city").val();
               $.ajax({
                     method: "get",
                     url: "post.php",
@@ -61,6 +71,15 @@
                   }
                });
             });
+
+            if((localStorage.getItem('names') !== null))
+            {
+                var storedNames = JSON.parse(localStorage.getItem("names")); 
+                console.log(storedNames);
+                $('.country').text( storedNames[0]);
+                $('.state').text( storedNames[1]);
+                $('.city').text( storedNames[2]);
+            }            
         });
    </script>
     <div class="container  col-md-4 " style="margin:100px 0px 0px 450px; border: 1px solid #ccc">
@@ -69,13 +88,13 @@
                 <h4>SElECT STATES</h4>
                 <label for="country"> Country</label>
                 <select class="form-select" id="country">
-                    <option value=""> Select Country</option>
+                    <option class="country" value=""> Select Country</option>
                     <?php
                         $sql = "select * from tbl_countries";
                         $data=mysqli_query($con,$sql);
                         if($data->num_rows > 0)
                         {
-                            echo '<option value="">Select State</option>';
+                            echo '<option  value="">Select State</option>';
                             while ($row = mysqli_fetch_assoc($data)) {
                             echo '<option value="' . $row['id'] . '">' . $row['name'] . '</option>';
                             }
@@ -86,13 +105,13 @@
             <div class="form-group py-2">
                 <label for="country"> State</label>
                 <select class="form-select" id="state">
-                    <option value="">select State</option>
+                    <option class="state" value="">select State</option>
                 </select>
             </div>
             <div class="form-group py-2 ">
                 <label for="country"> City</label>
                 <select class="form-select" id="city">
-                    <option value="">select City</option>
+                    <option class="city" value="">select City</option>
                 </select>
             </div>
             <button type="submit" id="submit"  class="btn btn-success">Success</button>
